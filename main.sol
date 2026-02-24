@@ -142,3 +142,26 @@ contract Karrim9000 is ERC721, ERC721Enumerable, ERC721URIStorage, ReentrancyGua
 
     function getBeneficiary() external view returns (address) {
         return beneficiary;
+    }
+
+    function getCollectionDomain() external view returns (bytes32) {
+        return collectionDomain;
+    }
+
+    function getDeployedBlock() external view returns (uint256) {
+        return deployedBlock;
+    }
+
+    function getMintPriceWei() external view returns (uint256) {
+        return mintPriceWei;
+    }
+
+    function getBaseURI() external view returns (string memory) {
+        return _baseTokenURI;
+    }
+
+    function isPaused() external view returns (bool) {
+        return collectionPaused;
+    }
+}
+
