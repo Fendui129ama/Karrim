@@ -70,3 +70,27 @@ contract Karrim9000 is ERC721, ERC721Enumerable, ERC721URIStorage, ReentrancyGua
     function mint(address to) external payable nonReentrant returns (uint256 tokenId) {
         if (collectionPaused) revert K9K_CollectionPaused();
         if (to == address(0)) revert K9K_ZeroAddress();
+        if (nextTokenId > K9K_MAX_SUPPLY) revert K9K_MaxSupplyReached();
+        if (msg.value < mintPriceWei) revert K9K_InsufficientPayment();
+
+        tokenId = nextTokenId++;
+        _safeMint(to, tokenId);
+        if (mintPriceWei > 0) {
+            (bool sent,) = beneficiary.call{value: mintPriceWei}("");
+            if (!sent) revert K9K_TransferFailed();
+        }
+        if (msg.value > mintPriceWei) {
+            (bool refund,) = msg.sender.call{value: msg.value - mintPriceWei}("");
+            if (!refund) revert K9K_TransferFailed();
+        }
+        emit TokenMinted(tokenId, to, mintPriceWei, block.number);
+        return tokenId;
+    }
+
+    function mintWithURI(address to, string calldata tokenURI_) external payable nonReentrant returns (uint256 tokenId) {
+        if (collectionPaused) revert K9K_CollectionPaused();
+        if (to == address(0)) revert K9K_ZeroAddress();
+        if (nextTokenId > K9K_MAX_SUPPLY) revert K9K_MaxSupplyReached();
+        if (msg.value < mintPriceWei) revert K9K_InsufficientPayment();
+
+        tokenId = nextTokenId++;
