@@ -22,3 +22,27 @@ contract Karrim9000 is ERC721, ERC721Enumerable, ERC721URIStorage, ReentrancyGua
     event CollectionPauseToggled(bool paused);
 
     error K9K_ZeroAddress();
+    error K9K_ZeroAmount();
+    error K9K_MaxSupplyReached();
+    error K9K_InsufficientPayment();
+    error K9K_CollectionPaused();
+    error K9K_TransferFailed();
+    error K9K_InvalidTokenId();
+    error K9K_NotBeneficiary();
+
+    uint256 public constant K9K_MAX_SUPPLY = 9000;
+    uint256 public constant K9K_COLLECTION_SALT = 0x4F8b2E6a0D3c7F1A9e5B8d2C6f0A4e8B1d5F9c3;
+
+    address public immutable beneficiary;
+    uint256 public immutable deployedBlock;
+    bytes32 public immutable collectionDomain;
+
+    uint256 public mintPriceWei;
+    uint256 public nextTokenId;
+    string private _baseTokenURI;
+    bool public collectionPaused;
+
+    constructor() ERC721("Karrim 9000", "K9K") {
+        beneficiary = address(0xF4b7E2a9D1c6E0f3A8b5D2e9C1f7A4b0E6d3C9);
+        deployedBlock = block.number;
+        collectionDomain = keccak256(abi.encodePacked("Karrim9000_", block.chainid, block.prevrandao, K9K_COLLECTION_SALT));
