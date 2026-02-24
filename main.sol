@@ -94,3 +94,27 @@ contract Karrim9000 is ERC721, ERC721Enumerable, ERC721URIStorage, ReentrancyGua
         if (msg.value < mintPriceWei) revert K9K_InsufficientPayment();
 
         tokenId = nextTokenId++;
+        _safeMint(to, tokenId);
+        _setTokenURI(tokenId, tokenURI_);
+        if (mintPriceWei > 0) {
+            (bool sent,) = beneficiary.call{value: mintPriceWei}("");
+            if (!sent) revert K9K_TransferFailed();
+        }
+        if (msg.value > mintPriceWei) {
+            (bool refund,) = msg.sender.call{value: msg.value - mintPriceWei}("");
+            if (!refund) revert K9K_TransferFailed();
+        }
+        emit TokenMinted(tokenId, to, mintPriceWei, block.number);
+        return tokenId;
+    }
+
+    function _baseURI() internal view override returns (string memory) {
+        return _baseTokenURI;
+    }
+
+    function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
+        return super.tokenURI(tokenId);
+    }
+
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId, uint256 batchSize) internal override(ERC721, ERC721Enumerable) {
+        super._beforeTokenTransfer(from, to, tokenId, batchSize);
