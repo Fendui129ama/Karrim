@@ -46,3 +46,27 @@ contract Karrim9000 is ERC721, ERC721Enumerable, ERC721URIStorage, ReentrancyGua
         beneficiary = address(0xF4b7E2a9D1c6E0f3A8b5D2e9C1f7A4b0E6d3C9);
         deployedBlock = block.number;
         collectionDomain = keccak256(abi.encodePacked("Karrim9000_", block.chainid, block.prevrandao, K9K_COLLECTION_SALT));
+        mintPriceWei = 0.01 ether;
+        nextTokenId = 1;
+    }
+
+    function setCollectionPaused(bool paused) external onlyOwner {
+        collectionPaused = paused;
+        emit CollectionPauseToggled(paused);
+    }
+
+    function setMintPriceWei(uint256 newPriceWei) external onlyOwner {
+        uint256 prev = mintPriceWei;
+        mintPriceWei = newPriceWei;
+        emit MintPriceUpdated(prev, newPriceWei, block.number);
+    }
+
+    function setBaseURI(string calldata baseURI_) external onlyOwner {
+        string memory prev = _baseTokenURI;
+        _baseTokenURI = baseURI_;
+        emit BaseURISet(prev, baseURI_, block.number);
+    }
+
+    function mint(address to) external payable nonReentrant returns (uint256 tokenId) {
+        if (collectionPaused) revert K9K_CollectionPaused();
+        if (to == address(0)) revert K9K_ZeroAddress();
