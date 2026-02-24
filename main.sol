@@ -118,3 +118,27 @@ contract Karrim9000 is ERC721, ERC721Enumerable, ERC721URIStorage, ReentrancyGua
 
     function _beforeTokenTransfer(address from, address to, uint256 tokenId, uint256 batchSize) internal override(ERC721, ERC721Enumerable) {
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
+    }
+
+    function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
+        super._burn(tokenId);
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable, ERC721URIStorage) returns (bool) {
+        return super.supportsInterface(interfaceId);
+    }
+
+    function totalMinted() external view returns (uint256) {
+        return nextTokenId - 1;
+    }
+
+    function maxSupply() external pure returns (uint256) {
+        return K9K_MAX_SUPPLY;
+    }
+
+    function remainingSupply() external view returns (uint256) {
+        return nextTokenId > K9K_MAX_SUPPLY ? 0 : K9K_MAX_SUPPLY - nextTokenId + 1;
+    }
+
+    function getBeneficiary() external view returns (address) {
+        return beneficiary;
